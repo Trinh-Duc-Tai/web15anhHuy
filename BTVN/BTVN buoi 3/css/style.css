@@ -1,0 +1,35 @@
+.header {
+    font-weight: bold;
+    background-color: #0000ff;
+    text-align: center;
+}
+
+.nav {
+    background-color: #800080;
+    font-weight: bold;
+    text-align: center;
+}
+
+.main {
+    font-weight: bold;
+    background-color: #ffd700;
+    width: 75%;
+    height: 380px;
+    text-align: center;
+    float: left;
+}
+
+.aside {
+    font-weight: bold;
+    background-color: #808080;
+    float: right;
+    height: 380px;
+    text-align: center;
+    width: 25%;
+}
+
+.footer {
+    font-weight: bold;
+    background-color: #00ffff;
+    text-align: center;
+}

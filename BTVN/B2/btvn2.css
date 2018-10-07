@@ -1,0 +1,39 @@
+nav{
+    background-color: #D5B0AC;
+    font-weight: bold;
+    text-align: center;
+    line-height: 30px;
+}
+nav a{
+	color: #402E2A;
+}
+nav span{
+    display: inline-block;
+    width: 100px;
+    height: 30px;
+    border-bottom-color: azure;
+}
+nav span:hover{
+    color: #FFFFFF ;
+    background-color: #9CD08F ;
+}
+body{
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+div.vertical{
+    width: 102px;
+    height: 104px;
+    left:45%;
+    position: absolute;
+    top:80%;
+}
+
+nav.menu.menu_vertical span{
+    height: 30px;
+    border: red 1px dotted;
+    /* border-width: 1px;
+    border-color: rgb(255, 255, 255); */
+    
+}
