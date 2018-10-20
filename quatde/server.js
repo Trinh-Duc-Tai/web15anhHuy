@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 
 const QuestionModel = require('./models/questionModel');
 
-mongoose.connect("mongodb://localhost/quyetde", (err) => {
+mongoose.connect("mongodb://localhost/quatde", (err) => {
 	if(err) console.log(err)
 	else console.log("DB connect success!");
 });
