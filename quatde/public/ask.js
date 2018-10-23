@@ -13,3 +13,6 @@ $("#questionContent").on("input", function() {
 	var remainChar = maxLength - $("#questionContent").val().length;
 	$("#remain").text(remainChar);
 });
+$("#rset").on("click",function(){
+	$("#remain").text(maxLength);
+});
