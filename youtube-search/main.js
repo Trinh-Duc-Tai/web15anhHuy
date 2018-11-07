@@ -1,63 +1,81 @@
-let pageToken = '';
-let isLoadingMore = false;
-let getVideoTimeout;
+var nextPageToken = null;
+var isLoading = false;
+var debouncing = null;
+var throttling = false;
 
-$(document).ready(function () {
-    $('#search').on('submit', function (event) {
-        event.preventDefault();
-        const keyword = $("#keyword").val();
-        getVideoItem(keyword);
-        //xoa tim kiem
-        $('#result-list').empty();
-        $(window).on('scroll', function () {
-            if ($(document).height() - ($(window).height() + $(window).scrollTop()) < 1000) {
-                const keyword = $('#keyword').val();
-                // keo xuong duyet video
-                if (!isLoadingMore && pageToken !== '') {
-                    isLoadingMore = true;
-                    getVideoItem(keyword);
-                }
-            }
-        });
-        //sau 1s tu search video
-        if (getVideoTimeout) clearTimeout(getVideoTimeout);
+$(document).ready(function() {
+	$('#keyword').on('input', function() {
+		// $('#result-list').empty();
+		$('#result-list').html('');
 
-        getVideoTimeout = setTimeout(function () {
-            getVideoItem(keyword);
-        }, 1000);
+		$('.lds-hourglass').css("opacity", "1");
 
-    });
+		const keyword = $("#keyword").val();
+
+		//debounce
+		// clearTimeout(debouncing);
+		// if(keyword) {
+		// 	debouncing = setTimeout(function() {
+		// 		console.log(keyword);
+		// 		nextPageToken = null;
+		// 		loadData(keyword);
+		// 	}, 3000);
+		// } else {
+		// 	$('.lds-hourglass').css("opacity", "0");
+		// }
+
+		//throttle
+		// clearTimeout(throttling);
+		if(keyword) {
+			if(!throttling) {
+				console.log(keyword);
+				throttling = true;
+				setTimeout(function() {
+					throttling = false;
+				}, 1000);
+				nextPageToken = null;
+				loadData(keyword);
+			}
+		} else {
+			$('.lds-hourglass').css("opacity", "0");
+		}
+	});
+
+	$(window).on("scroll", function() {
+		if($(document).height() - ($(window).height() + $(window).scrollTop()) < 500) {
+			if(!isLoading) {
+				console.log("Load them data");
+				$('.lds-hourglass').css("opacity", "1");
+				isLoading = true;
+				const keyword = $("#keyword").val();
+				loadData(keyword);
+			}
+		}
+	});
 });
-function getVideoItem(keyword) {
-    $.ajax({
-        url: `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=25&q=${keyword}&type=video&key=AIzaSyA9gQZ-oYomFypZN7PsupZJtOfQqA6Q3qw&pageToken=${pageToken}`,
 
-        type: "GET",
-        success: function (response) {
+function loadData(keyword) {
+	$.ajax({
+		url: `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=25&q=${keyword}&type=video&key=AIzaSyA9gQZ-oYomFypZN7PsupZJtOfQqA6Q3qw${nextPageToken ? '&pageToken='+nextPageToken : ''}`,
+		type: "GET",
+		success: function(data) {
+			if(data.nextPageToken) nextPageToken = data.nextPageToken
+			else nextPageToken = null;
 
-            let videoListItem = response.items.map(function (videoItem) {
-                return `
-                            <a class="result col-md-12" href="https://www.youtube.com/watch?v=${videoItem.id.videoId}?autoplay=true" target="_blank">
-                                  <img src="${videoItem.snippet.thumbnails.high.url}" alt="">
-                                   <div class="video_info">
-                                   <p class="description">${videoItem.snippet.description}</p>
-                                      <span>View >></span>
-                                    </div>
-                              </a>
-                          `;
-            });
-            $('#result-list').append(videoListItem);
-
-            if (response.nextPageToken) pageToken = response.nextPageToken;
-
-            isLoadingMore = false;
-
-
-            if (response.items.length == 0 || !response.nextPageToken) {
-                pageToken = '';
-
-                $('#result-list').append('<h2>No more!</h2>');
-            }
-        }
-    });
+			const items = data.items;
+			let listElem = items.map(item => `
+				<a class="result col-md-12" href="https://www.youtube.com/watch?v=${item.id.videoId}?autoplay=true" target="_blank">
+					<img src="${item.snippet.thumbnails.high.url}" alt="">
+					<div class="video_info">
+						<h2 class="title">${item.snippet.title}</h2>
+						<p class="description">${item.snippet.description}</p>
+						<span>View >></span>
+					</div>
+				</a>
+			`);
+			$("#result-list").append(listElem);
+			isLoading = false;
+			$('.lds-hourglass').css("opacity", "0");
+		}
+	});
 }
